@@ -2,6 +2,9 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using Mono.Data.Sqlite;
+
 
 public class Search : MonoBehaviour {
 
@@ -57,5 +60,40 @@ public class Search : MonoBehaviour {
 					break;
 			}
 		}
+
+		string connectionStr = "URI=" + Application.dataPath + "/Plugins/MTGDB.sqlite";
+		IDbConnection dbcon = (IDbConnection)new SqliteConnection (connectionStr);
+		dbcon.Open ();
+
+		IDbCommand dbcmd = dbcon.CreateCommand();
+
+		Debug.Log ("db: " + dbcon.Database.ToString());
+		Debug.Log ("state: " + dbcon.State.ToString());
+		Debug.Log ("cstr: " + dbcon.ConnectionString.ToString());
+
+		string sql = "CREATE TABLE highscoresNilss (name VARCHAR(20), score INT)";
+		dbcmd.CommandText = sql;
+		dbcmd.ExecuteNonQuery();
+		
+		sql = "SELECT * FROM Sets";
+		Debug.Log ("running: " + sql);
+		dbcmd.CommandText = sql;
+		
+		IDataReader reader = dbcmd.ExecuteReader();
+
+		Debug.Log ("field count: " + reader.FieldCount.ToString());
+		Debug.Log ("depth: " + reader.Depth.ToString());
+
+		while (reader.Read()) {
+			Debug.Log ("val0: " + reader.GetValue(0).ToString());
+			Debug.Log ("Set: " + reader.GetString(1));
+		}
+
+			reader.Close();
+			reader = null;
+			dbcmd.Dispose();
+			dbcmd = null;
+			dbcon.Close();
+			dbcon = null;
 	}
 }
