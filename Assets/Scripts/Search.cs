@@ -202,9 +202,7 @@ public class Search : MonoBehaviour {
 
 		while (reader.Read()) 
 		{
-
-			Debug.Log ("val0: " + reader.GetValue(0).ToString());
-			Debug.Log ("Set: " + reader.GetString(1));
+			// grab data here
 		}
 
 			reader.Close();
