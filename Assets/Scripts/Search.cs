@@ -35,6 +35,59 @@ public class Search : MonoBehaviour {
 	public bool bColorless=true;
 	public int ColorOpts= 0;
 
+	public ArrayList ResultSet;
+
+	private CardDisplay cardDisplayController;
+
+	void Start()
+	{
+		GameObject cardDisplayObj = new GameObject();
+		cardDisplayObj = GameObject.Find ("DisplayController");
+		cardDisplayController = cardDisplayObj.GetComponent<CardDisplay> ();
+	}
+
+	public void DoSearch()
+	{
+		GetFieldValues ();
+		string query = BuildQuery ();
+
+		ResultSet = new ArrayList ();
+
+		string connectionStr = "URI=" + Application.dataPath + "/Plugins/MTGDB.sqlite";
+		IDbConnection dbcon = (IDbConnection)new SqliteConnection (connectionStr);
+		dbcon.Open ();
+
+		IDbCommand dbcmd = dbcon.CreateCommand();
+
+		dbcmd.CommandText = query;
+		dbcmd.ExecuteNonQuery();
+
+		IDataReader reader = dbcmd.ExecuteReader();
+
+		Debug.Log ("db: " + dbcon.Database.ToString());
+		Debug.Log ("state: " + dbcon.State.ToString());
+		Debug.Log ("cstr: " + dbcon.ConnectionString.ToString());
+		Debug.Log ("Query: " + query);
+		Debug.Log ("field count: " + reader.FieldCount.ToString());
+		Debug.Log ("depth: " + reader.Depth.ToString());
+
+		while (reader.Read()) 
+		{
+			ResultSet.Add (new Result(reader));
+		}
+		
+		Debug.Log ("num records: " + ResultSet.Count);
+
+		reader.Close();
+		reader = null;
+		dbcmd.Dispose();
+		dbcmd = null;
+		dbcon.Close();
+		dbcon = null;
+
+		cardDisplayController.InitCardDisplay (ResultSet);
+	}
+
 	public void GetFieldValues()
 	{
 		InputField InputFieldComponent;
@@ -174,43 +227,6 @@ public class Search : MonoBehaviour {
 				break;
 			}
 		}
-	}
-
-	public void DoSearch()
-	{
-		GetFieldValues ();
-		string query = BuildQuery ();
-
-		string connectionStr = "URI=" + Application.dataPath + "/Plugins/MTGDB.sqlite";
-		IDbConnection dbcon = (IDbConnection)new SqliteConnection (connectionStr);
-		dbcon.Open ();
-
-		IDbCommand dbcmd = dbcon.CreateCommand();
-
-		dbcmd.CommandText = query;
-		dbcmd.ExecuteNonQuery();
-
-		IDataReader reader = dbcmd.ExecuteReader();
-
-		Debug.Log ("db: " + dbcon.Database.ToString());
-		Debug.Log ("state: " + dbcon.State.ToString());
-		Debug.Log ("cstr: " + dbcon.ConnectionString.ToString());
-		Debug.Log ("Query: " + query);
-		Debug.Log ("field count: " + reader.FieldCount.ToString());
-		Debug.Log ("depth: " + reader.Depth.ToString());
-		Debug.Log ("num records: " + reader.RecordsAffected.ToString());
-
-		while (reader.Read()) 
-		{
-			// grab data here
-		}
-
-			reader.Close();
-			reader = null;
-			dbcmd.Dispose();
-			dbcmd = null;
-			dbcon.Close();
-			dbcon = null;
 	}
 
 	private string BuildQuery()

@@ -45,8 +45,9 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\ResultData.cs" />
+     <Compile Include="Assets\Scripts\CardDisplay.cs" />
      <Compile Include="Assets\Scripts\MusicController.cs" />
+     <Compile Include="Assets\Scripts\Result.cs" />
      <Compile Include="Assets\Scripts\Search.cs" />
      <Compile Include="Assets\Scripts\buttonController.cs" />
      <Compile Include="Assets\Scripts\searchData.cs" />
