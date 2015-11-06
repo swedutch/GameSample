@@ -13,6 +13,13 @@ public class CardDisplay : MonoBehaviour {
 	private GameObject SearchObj;
 	private ArrayList results;
 
+	public GameObject rArrowObj;
+	private CardDisplayArrow rArrowController;
+
+
+	public GameObject lArrowObj;
+	private CardDisplayArrow lArrowController;
+
 	private int currentIndex = 0;
 	private string sortMode = "cardname";
 	private string sortDir = "asc";
@@ -24,6 +31,9 @@ public class CardDisplay : MonoBehaviour {
 		GameObjs = new GameObject[12];
 		sprites = new SpriteRenderer[12];
 
+		rArrowController = rArrowObj.GetComponent<CardDisplayArrow> ();
+		lArrowController = lArrowObj.GetComponent<CardDisplayArrow> ();
+
 		for(int i = 0; i < 12; i++)
 		{
 			GameObjs[i] = GameObject.Find ("Card (" + (i).ToString() + ")");
@@ -31,13 +41,12 @@ public class CardDisplay : MonoBehaviour {
 		}
 	}
 	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+/********************* **********************/
 
 	public void InitCardDisplay(ArrayList resData)
 	{
+		rArrowController.Deactivate();
+		lArrowController.Deactivate();
 		results = resData;
 		currentIndex = 0;
 
@@ -45,6 +54,35 @@ public class CardDisplay : MonoBehaviour {
 
 		Debug.Log("num res: " + results.Count);
 
+		if (results.Count > 12) {
+			rArrowController.Activate();
+		}
+
+		Move ();
+	}
+
+	public void Next()
+	{
+		currentIndex += 12;
+		lArrowController.Activate();
+
+		Move ();
+	}
+
+	public void Prev()
+	{
+		currentIndex -= 12;
+		if(currentIndex <= 0)
+		{
+			currentIndex = 0;
+			lArrowController.Deactivate();
+		}
+
+		Move ();
+	}
+
+	private void Move()
+	{
 		for (int i = 0; i < 12; i++) 
 		{
 			if(i < results.Count)
@@ -73,7 +111,7 @@ public class CardDisplay : MonoBehaviour {
 
 			if (!File.Exists (imgpath)) 
 			{
-				StartCoroutine(FetchImage(i, updateImage));
+				StartCoroutine(FetchImage(i));
 			} 
 			else
 			{
@@ -95,7 +133,7 @@ public class CardDisplay : MonoBehaviour {
 		return null;
 	}
 
-    IEnumerator FetchImage(int i, Action<int,Texture2D> updateCallback)
+    IEnumerator FetchImage(int i)
 	{
 		Result c = (Result)results [i+currentIndex];
 		
@@ -129,7 +167,7 @@ public class CardDisplay : MonoBehaviour {
 		
 		if(c.texture != null)
 		{
-			cardImg = Sprite.Create(c.texture,new Rect(0, 0, c.texture.width, c.texture.height),new Vector2(0,0), 100.0f);
+			cardImg = Sprite.Create(c.texture,new Rect(0, 0, c.texture.width, c.texture.height),new Vector2(0.5f,0.5f), 100.0f);
 			//save card image
 		}
 		else
@@ -140,10 +178,14 @@ public class CardDisplay : MonoBehaviour {
 
 		((Result)results [i+currentIndex]).sprite = cardImg;
 		sprites [i].color = new Color (255f, 255f, 255f, 0f);
+
+		float relativeSize = sprites [i].sprite.rect.xMax * sprites [i].localToWorldMatrix.m00;
+		float scale = relativeSize / cardImg.rect.xMax; //0.68f;
+
 		sprites[i].sprite = cardImg;
-		float x = 0.68f;
-		float y = 0.68f;
-		sprites[i].transform.localScale = new Vector3(x,y);
+
+		sprites[i].transform.localScale = new Vector3(scale,scale);
+	
 		sprites [i].color = new Color (255f, 255f, 255f, 255f);
 
 	}
