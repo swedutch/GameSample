@@ -53,8 +53,8 @@ public class Search : MonoBehaviour {
 
 		ResultSet = new ArrayList ();
 
-		string connectionStr = "URI=" + Application.dataPath + "/Plugins/MTGDB.sqlite";
-		IDbConnection dbcon = (IDbConnection)new SqliteConnection (connectionStr);
+		string connectionStr = "URI=file://" + Application.dataPath + "/Plugins/MTGDB.sqlite";
+		IDbConnection dbcon = new SqliteConnection (connectionStr);
 		dbcon.Open ();
 
 		IDbCommand dbcmd = dbcon.CreateCommand();
