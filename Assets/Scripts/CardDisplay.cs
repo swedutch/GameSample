@@ -66,6 +66,10 @@ public class CardDisplay : MonoBehaviour {
 		currentIndex += 12;
 		lArrowController.Activate();
 
+		if (currentIndex >= results.Count) {
+			rArrowController.Deactivate();
+		}
+
 		Move ();
 	}
 
@@ -85,7 +89,7 @@ public class CardDisplay : MonoBehaviour {
 	{
 		for (int i = 0; i < 12; i++) 
 		{
-			if(i < results.Count)
+			if(i + currentIndex < results.Count)
 			{
 				sprites[i].color = new Color(255f, 255f, 255f, 255f);
 				SetImage(i);

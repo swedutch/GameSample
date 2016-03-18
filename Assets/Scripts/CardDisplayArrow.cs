@@ -45,6 +45,7 @@ public class CardDisplayArrow : MonoBehaviour {
 
 	public void Deactivate()
 	{
+		Debug.Log ("Deactivate");
 		m_SpriteRenderer.color = inactiveColor;
 		m_defaultColor = inactiveColor;
 		isActive = false;
